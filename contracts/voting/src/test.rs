@@ -19,6 +19,7 @@ fn test_initialize() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
 
     let parties = client.get_parties();
@@ -32,6 +33,7 @@ fn test_initialize_twice() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     client.initialize(&admin);
 }
@@ -42,6 +44,7 @@ fn test_add_party() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     
     let party_a = symbol_short!("PartyA");
@@ -66,6 +69,7 @@ fn test_add_duplicate_party() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     
     let party_a = symbol_short!("PartyA");
@@ -79,6 +83,7 @@ fn test_add_voter() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     client.add_voter(&voter1);
     client.add_voter(&voter2);
@@ -94,6 +99,7 @@ fn test_add_duplicate_voter() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     client.add_voter(&voter1);
     client.add_voter(&voter1);
@@ -105,6 +111,7 @@ fn test_voting() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     
     let party_a = symbol_short!("PartyA");
@@ -131,6 +138,7 @@ fn test_unregistered_voter_cannot_vote() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     
     let party_a = symbol_short!("PartyA");
@@ -146,6 +154,7 @@ fn test_vote_for_nonexistent_party() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     client.add_voter(&voter1);
 
@@ -160,6 +169,7 @@ fn test_double_voting() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     
     let party_a = symbol_short!("PartyA");
@@ -179,6 +189,7 @@ fn test_delegation() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     
     let party_a = symbol_short!("PartyA");
@@ -204,6 +215,7 @@ fn test_self_delegation() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     client.add_voter(&voter1);
 
@@ -217,6 +229,7 @@ fn test_unregistered_delegator() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     client.add_voter(&voter2);
 
@@ -230,6 +243,7 @@ fn test_delegate_to_unregistered() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     client.add_voter(&voter1);
 
@@ -243,6 +257,7 @@ fn test_delegated_voter_cannot_vote() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     
     let party_a = symbol_short!("PartyA");
@@ -260,6 +275,7 @@ fn test_voting_stats() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     
     let party_a = symbol_short!("PartyA");
@@ -287,6 +303,7 @@ fn test_get_all_results() {
     let contract_id = env.register(VotingContract, ());
     let client = VotingContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin);
     
     let party_a = symbol_short!("PartyA");
@@ -342,7 +359,7 @@ fn test_past_deadline() {
     env.mock_all_auths();
     client.initialize(&admin);
     
-    let past_deadline = env.ledger().timestamp() - 1;
+    let past_deadline = env.ledger().timestamp().saturating_sub(1);
     client.set_voting_deadline(&past_deadline);
 }
 

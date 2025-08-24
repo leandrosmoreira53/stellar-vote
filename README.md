@@ -1,219 +1,206 @@
-# Stellar Soroban Voting Smart Contract
+# 🗳️ Smart Contract de Votação Soroban (Stellar)
 
-Um contrato inteligente de votação simples de múltipla escolha construído em Rust para a plataforma Stellar Soroban.
+Um sistema de votação de múltipla escolha implementado em Rust para a rede Stellar usando Soroban.
 
-## Características
+## 🚀 Funcionalidades
 
-- **Votação de Múltipla Escolha**: Suporte para múltiplos partidos/opções de voto
-- **Registro de Votantes**: Apenas votantes registrados podem votar
-- **Prevenção de Voto Duplo**: Cada votante pode votar apenas uma vez
-- **Delegação de Votos**: Votantes podem delegar seus votos para outros
-- **Controle de Acesso**: Apenas o administrador pode registrar partidos e votantes
-- **Transparência**: Contagem de votos em tempo real e estatísticas
-- **Limite de Tempo**: Suporte para definir prazo limite para votação
-- **Proteção Avançada**: Prevenção de delegação circular e cadeia longa demais
+- ✅ **Votação de múltipla escolha**
+- ✅ **Controle de admin** para gerenciar eleições
+- ✅ **Verificação de votos únicos** por endereço
+- ✅ **Resultados em tempo real**
+- ✅ **Interface simples e intuitiva**
 
-## Estrutura do Projeto
+## 📋 Pré-requisitos
 
-```
-.
-├── Cargo.toml              # Configuração do workspace
-├── README.md               # Este arquivo
-└── contracts/
-    └── voting/
-        ├── Cargo.toml      # Configuração do contrato
-        └── src/
-            ├── lib.rs      # Implementação principal do contrato
-            └── test.rs     # Suite de testes
-```
+- Rust (versão 1.70+)
+- Cargo
+- Soroban CLI
+- Conta na rede Stellar Testnet
 
-## Pré-requisitos
+## 🔧 Instalação
 
-- [Rust](https://rustup.rs/) (versão mais recente)
-- [Soroban CLI](https://soroban.stellar.org/docs/getting-started/setup)
-
-## Instalação
-
-1. Clone o repositório:
+### 1. Instalar Soroban CLI
 ```bash
-git clone <seu-repo>
-cd vote
+cargo install --locked soroban-cli
 ```
 
-2. Instale as dependências:
+### 2. Verificar instalação
 ```bash
-cargo check
+soroban --version
 ```
 
-## Compilação
+## 🚀 Deploy Automatizado
 
-Para compilar o contrato:
+### Opção 1: Script Automatizado (Recomendado)
+```bash
+# Tornar executável
+chmod +x deploy.sh
 
+# Executar deploy
+./deploy.sh
+```
+
+### Opção 2: Deploy Manual
+
+#### Passo 1: Compilar
 ```bash
 cargo build --target wasm32-unknown-unknown --release
 ```
 
-Para compilar com otimizações para Soroban:
-
+#### Passo 2: Otimizar WASM
 ```bash
-stellar contract build
+soroban contract optimize --wasm target/wasm32-unknown-unknown/release/voting.wasm
 ```
 
-## Testes
-
-Execute todos os testes:
-
+#### Passo 3: Configurar Identidade
 ```bash
-cargo test
+soroban keys generate alice
 ```
 
-Execute testes específicos:
-
+#### Passo 4: Configurar Rede Testnet
 ```bash
-cargo test test_voting
-cargo test test_delegation
+soroban network add testnet \
+  --rpc-url https://soroban-testnet.stellar.org:443 \
+  --network-passphrase "Test SDF Network ; September 2015"
 ```
 
-## Uso do Contrato
-
-### Funções Principais
-
-#### `initialize(admin: Address)`
-Inicializa o contrato com um endereço de administrador.
-
-```rust
-client.initialize(&admin_address);
-```
-
-#### `add_party(party_name: Symbol)`
-Adiciona um novo partido/opção de voto (apenas admin).
-
-```rust
-client.add_party(&symbol_short!("PartyA"));
-```
-
-#### `add_voter(voter: Address)`
-Registra um novo votante (apenas admin).
-
-```rust
-client.add_voter(&voter_address);
-```
-
-#### `vote(voter: Address, party_name: Symbol)`
-Permite que um votante registrado vote em um partido.
-
-```rust
-client.vote(&voter_address, &symbol_short!("PartyA"));
-```
-
-#### `delegate(delegator: Address, delegate_to: Address)`
-Permite que um votante delegue seu voto para outro votante.
-
-```rust
-client.delegate(&delegator_address, &delegate_address);
-```
-
-#### `set_voting_deadline(deadline: u64)`
-Define um prazo limite para votação (apenas admin).
-
-```rust
-let deadline = env.ledger().timestamp() + 86400; // 24 horas
-client.set_voting_deadline(&deadline);
-```
-
-### Funções de Consulta
-
-#### `get_vote_count(party_name: Symbol) -> u32`
-Retorna o número de votos para um partido específico.
-
-#### `get_parties() -> Vec<Symbol>`
-Retorna a lista de todos os partidos registrados.
-
-#### `get_voter_status(voter: Address) -> VoterStatus`
-Retorna o status de um votante específico.
-
-#### `get_voting_stats() -> VotingStats`
-Retorna estatísticas gerais da votação.
-
-#### `get_all_results() -> Map<Symbol, u32>`
-Retorna os resultados completos da votação.
-
-#### `get_voting_deadline() -> Option<u64>`
-Retorna o prazo limite para votação, se definido.
-
-## Estados do Votante
-
-- `NotRegistered`: Votante não registrado
-- `Registered`: Votante registrado, pode votar
-- `Voted`: Votante já votou
-- `Delegated(Address)`: Votante delegou seu voto
-
-## Regras de Votação
-
-1. **Registro**: Apenas o administrador pode registrar partidos e votantes
-2. **Voto Único**: Cada votante pode votar apenas uma vez
-3. **Partidos Válidos**: Só é possível votar em partidos registrados
-4. **Delegação**: 
-   - Votantes podem delegar apenas se ainda não votaram
-   - Não é possível delegar para si mesmo
-   - Não é possível delegar para alguém que já votou ou delegou
-5. **Poder de Voto**: Votantes acumulam votos delegados ao votar
-6. **Prazo Limite**: Votação pode ter deadline definido pelo administrador
-7. **Proteção Circular**: Sistema previne delegação circular e cadeias muito longas
-
-## Exemplo de Uso Completo
-
-```rust
-// Inicializar contrato
-client.initialize(&admin);
-
-// Adicionar partidos
-client.add_party(&symbol_short!("PartyA"));
-client.add_party(&symbol_short!("PartyB"));
-client.add_party(&symbol_short!("PartyC"));
-
-// Registrar votantes
-client.add_voter(&voter1);
-client.add_voter(&voter2);
-client.add_voter(&voter3);
-client.add_voter(&voter4);
-
-// Delegar votos
-client.delegate(&voter1, &voter2); // voter1 delega para voter2
-
-// Votar
-client.vote(&voter2, &symbol_short!("PartyA")); // voter2 vota (2 votos: próprio + delegado)
-client.vote(&voter3, &symbol_short!("PartyB")); // voter3 vota (1 voto)
-client.vote(&voter4, &symbol_short!("PartyA")); // voter4 vota (1 voto)
-
-// Verificar resultados
-let results = client.get_all_results();
-// PartyA: 3 votos, PartyB: 1 voto, PartyC: 0 votos
-```
-
-## Deploy
-
-Para fazer deploy na testnet Stellar:
-
+#### Passo 5: Deploy
 ```bash
-stellar contract deploy \
-  --wasm target/wasm32v1-none/release/voting.wasm \
+soroban contract deploy \
+  --wasm target/wasm32-unknown-unknown/release/voting.wasm \
   --source alice \
   --network testnet
 ```
 
-## Considerações de Segurança
+#### Passo 6: Inicializar
+```bash
+# Substitua [CONTRACT_ID] pelo ID retornado no deploy
+soroban contract invoke \
+  --id [CONTRACT_ID] \
+  --source alice \
+  --network testnet \
+  -- initialize \
+  --admin [ADMIN_ADDRESS]
+```
 
-- O contrato requer autenticação para todas as operações sensíveis
-- Prevenção de overflow em contadores de votos
-- Validação rigorosa de estados de votantes
-- Proteção contra delegação circular (básica)
+## 📖 Como Usar
 
-## Limitações
+### 1. Criar Eleição
+```bash
+soroban contract invoke \
+  --id [CONTRACT_ID] \
+  --source alice \
+  --network testnet \
+  -- create_election \
+  --title "Eleição Presidencial 2024" \
+  --description "Votação para presidente" \
+  --end_time 1735689600
+```
 
-- Tamanho máximo do contrato: 64KB (conforme limites do Soroban)
-- Máximo de 100 delegações em cadeia para evitar loops infinitos
+### 2. Adicionar Candidatos
+```bash
+soroban contract invoke \
+  --id [CONTRACT_ID] \
+  --source alice \
+  --network testnet \
+  -- add_party \
+  --name "Candidato A" \
+  --description "Partido Liberal"
+```
 
-## Licença
+### 3. Votar
+```bash
+soroban contract invoke \
+  --id [CONTRACT_ID] \
+  --source [VOTER_ADDRESS] \
+  --network testnet \
+  -- vote \
+  --election_id 0 \
+  --party_id 0
+```
 
-Este projeto é fornecido como exemplo educacional.
+### 4. Ver Resultados
+```bash
+soroban contract invoke \
+  --id [CONTRACT_ID] \
+  --source alice \
+  --network testnet \
+  -- get_results \
+  --election_id 0
+```
+
+## 🔍 Estrutura do Contrato
+
+### Funções Principais
+- `initialize(admin: Address)` - Inicializa o contrato
+- `create_election(title: String, description: String, end_time: u64)` - Cria nova eleição
+- `add_party(name: String, description: String)` - Adiciona candidato/partido
+- `vote(election_id: u32, party_id: u32)` - Registra voto
+- `get_results(election_id: u32)` - Obtém resultados da eleição
+
+### Estruturas de Dados
+- `Election` - Informações da eleição
+- `Party` - Informações do candidato/partido
+- `Vote` - Registro de voto individual
+
+## 🌐 Redes Disponíveis
+
+### Testnet
+- **RPC URL:** https://soroban-testnet.stellar.org:443
+- **Network Passphrase:** "Test SDF Network ; September 2015"
+- **Explorer:** https://stellar.expert/explorer/testnet/
+
+### Mainnet (Produção)
+- **RPC URL:** https://soroban-mainnet.stellar.org:443
+- **Network Passphrase:** "Public Global Stellar Network ; September 2015"
+
+## 💰 Funding (Testnet)
+
+Para obter XLM na testnet:
+- **Friendbot:** https://friendbot.stellar.org/
+- **Stellar Laboratory:** https://laboratory.stellar.org/
+
+## 🐛 Solução de Problemas
+
+### Erro: "stellar contract optimize"
+- **Problema:** Comando incorreto
+- **Solução:** Use `soroban contract optimize`
+
+### Erro: "No such file or directory"
+- **Problema:** Caminho incorreto do WASM
+- **Solução:** Verifique se o arquivo está em `target/wasm32-unknown-unknown/release/voting.wasm`
+
+### Erro: "Soroban CLI não encontrado"
+- **Problema:** CLI não instalado
+- **Solução:** Execute `cargo install --locked soroban-cli`
+
+## 📚 Recursos Adicionais
+
+- [Documentação Soroban](https://soroban.stellar.org/)
+- [Stellar Developer Portal](https://developers.stellar.org/)
+- [Rust Book](https://doc.rust-lang.org/book/)
+- [Soroban Examples](https://github.com/stellar/soroban-examples)
+
+## 🤝 Contribuição
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+
+## 🆘 Suporte
+
+Se encontrar problemas:
+1. Verifique os logs de erro
+2. Consulte a documentação
+3. Abra uma issue no GitHub
+4. Entre em contato com a equipe de desenvolvimento
+
+---
+
+**Desenvolvido com ❤️ para a comunidade Stellar**
