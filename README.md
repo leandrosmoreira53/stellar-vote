@@ -1,70 +1,70 @@
-# 🗳️ Smart Contract de Votação Soroban (Stellar)
+# 🗳️ Soroban Voting Smart Contract (Stellar)
 
-Um sistema de votação de múltipla escolha implementado em Rust para a rede Stellar usando Soroban.
+A multiple-choice voting system implemented in Rust for the Stellar network using Soroban.
 
-## 🚀 Funcionalidades
+## 🚀 Features
 
-- ✅ **Votação de múltipla escolha**
-- ✅ **Controle de admin** para gerenciar eleições
-- ✅ **Verificação de votos únicos** por endereço
-- ✅ **Resultados em tempo real**
-- ✅ **Interface simples e intuitiva**
+- ✅ **Multiple-choice voting**
+- ✅ **Admin control** for managing elections
+- ✅ **Unique vote verification** per address
+- ✅ **Real-time results**
+- ✅ **Simple and intuitive interface**
 
-## 📋 Pré-requisitos
+## 📋 Prerequisites
 
-- Rust (versão 1.70+)
+- Rust (version 1.70+)
 - Cargo
 - Soroban CLI
-- Conta na rede Stellar Testnet
+- Stellar Testnet account
 
-## 🔧 Instalação
+## 🔧 Installation
 
-### 1. Instalar Soroban CLI
+### 1. Install Soroban CLI
 ```bash
 cargo install --locked soroban-cli
 ```
 
-### 2. Verificar instalação
+### 2. Verify installation
 ```bash
 soroban --version
 ```
 
-## 🚀 Deploy Automatizado
+## 🚀 Automated Deployment
 
-### Opção 1: Script Automatizado (Recomendado)
+### Option 1: Automated Script (Recommended)
 ```bash
-# Tornar executável
+# Make executable
 chmod +x deploy.sh
 
-# Executar deploy
+# Execute deployment
 ./deploy.sh
 ```
 
-### Opção 2: Deploy Manual
+### Option 2: Manual Deployment
 
-#### Passo 1: Compilar
+#### Step 1: Compile
 ```bash
 cargo build --target wasm32-unknown-unknown --release
 ```
 
-#### Passo 2: Otimizar WASM
+#### Step 2: Optimize WASM
 ```bash
 soroban contract optimize --wasm target/wasm32-unknown-unknown/release/voting.wasm
 ```
 
-#### Passo 3: Configurar Identidade
+#### Step 3: Configure Identity
 ```bash
 soroban keys generate alice
 ```
 
-#### Passo 4: Configurar Rede Testnet
+#### Step 4: Configure Testnet Network
 ```bash
 soroban network add testnet \
   --rpc-url https://soroban-testnet.stellar.org:443 \
   --network-passphrase "Test SDF Network ; September 2015"
 ```
 
-#### Passo 5: Deploy
+#### Step 5: Deploy
 ```bash
 soroban contract deploy \
   --wasm target/wasm32-unknown-unknown/release/voting.wasm \
@@ -72,9 +72,9 @@ soroban contract deploy \
   --network testnet
 ```
 
-#### Passo 6: Inicializar
+#### Step 6: Initialize
 ```bash
-# Substitua [CONTRACT_ID] pelo ID retornado no deploy
+# Replace [CONTRACT_ID] with the ID returned from deployment
 soroban contract invoke \
   --id [CONTRACT_ID] \
   --source alice \
@@ -83,32 +83,32 @@ soroban contract invoke \
   --admin [ADMIN_ADDRESS]
 ```
 
-## 📖 Como Usar
+## 📖 How to Use
 
-### 1. Criar Eleição
+### 1. Create Election
 ```bash
 soroban contract invoke \
   --id [CONTRACT_ID] \
   --source alice \
   --network testnet \
   -- create_election \
-  --title "Eleição Presidencial 2024" \
-  --description "Votação para presidente" \
+  --title "Presidential Election 2024" \
+  --description "Presidential voting" \
   --end_time 1735689600
 ```
 
-### 2. Adicionar Candidatos
+### 2. Add Candidates
 ```bash
 soroban contract invoke \
   --id [CONTRACT_ID] \
   --source alice \
   --network testnet \
   -- add_party \
-  --name "Candidato A" \
-  --description "Partido Liberal"
+  --name "Candidate A" \
+  --description "Liberal Party"
 ```
 
-### 3. Votar
+### 3. Vote
 ```bash
 soroban contract invoke \
   --id [CONTRACT_ID] \
@@ -119,7 +119,7 @@ soroban contract invoke \
   --party_id 0
 ```
 
-### 4. Ver Resultados
+### 4. View Results
 ```bash
 soroban contract invoke \
   --id [CONTRACT_ID] \
@@ -129,78 +129,78 @@ soroban contract invoke \
   --election_id 0
 ```
 
-## 🔍 Estrutura do Contrato
+## 🔍 Contract Structure
 
-### Funções Principais
-- `initialize(admin: Address)` - Inicializa o contrato
-- `create_election(title: String, description: String, end_time: u64)` - Cria nova eleição
-- `add_party(name: String, description: String)` - Adiciona candidato/partido
-- `vote(election_id: u32, party_id: u32)` - Registra voto
-- `get_results(election_id: u32)` - Obtém resultados da eleição
+### Main Functions
+- `initialize(admin: Address)` - Initialize the contract
+- `create_election(title: String, description: String, end_time: u64)` - Create new election
+- `add_party(name: String, description: String)` - Add candidate/party
+- `vote(election_id: u32, party_id: u32)` - Cast vote
+- `get_results(election_id: u32)` - Get election results
 
-### Estruturas de Dados
-- `Election` - Informações da eleição
-- `Party` - Informações do candidato/partido
-- `Vote` - Registro de voto individual
+### Data Structures
+- `Election` - Election information
+- `Party` - Candidate/party information
+- `Vote` - Individual vote record
 
-## 🌐 Redes Disponíveis
+## 🌐 Available Networks
 
 ### Testnet
 - **RPC URL:** https://soroban-testnet.stellar.org:443
 - **Network Passphrase:** "Test SDF Network ; September 2015"
 - **Explorer:** https://stellar.expert/explorer/testnet/
 
-### Mainnet (Produção)
+### Mainnet (Production)
 - **RPC URL:** https://soroban-mainnet.stellar.org:443
 - **Network Passphrase:** "Public Global Stellar Network ; September 2015"
 
 ## 💰 Funding (Testnet)
 
-Para obter XLM na testnet:
+To obtain XLM on testnet:
 - **Friendbot:** https://friendbot.stellar.org/
 - **Stellar Laboratory:** https://laboratory.stellar.org/
 
-## 🐛 Solução de Problemas
+## 🐛 Troubleshooting
 
-### Erro: "stellar contract optimize"
-- **Problema:** Comando incorreto
-- **Solução:** Use `soroban contract optimize`
+### Error: "stellar contract optimize"
+- **Problem:** Incorrect command
+- **Solution:** Use `soroban contract optimize`
 
-### Erro: "No such file or directory"
-- **Problema:** Caminho incorreto do WASM
-- **Solução:** Verifique se o arquivo está em `target/wasm32-unknown-unknown/release/voting.wasm`
+### Error: "No such file or directory"
+- **Problem:** Incorrect WASM path
+- **Solution:** Verify the file is at `target/wasm32-unknown-unknown/release/voting.wasm`
 
-### Erro: "Soroban CLI não encontrado"
-- **Problema:** CLI não instalado
-- **Solução:** Execute `cargo install --locked soroban-cli`
+### Error: "Soroban CLI not found"
+- **Problem:** CLI not installed
+- **Solution:** Run `cargo install --locked soroban-cli`
 
-## 📚 Recursos Adicionais
+## 📚 Additional Resources
 
-- [Documentação Soroban](https://soroban.stellar.org/)
+- [Soroban Documentation](https://soroban.stellar.org/)
 - [Stellar Developer Portal](https://developers.stellar.org/)
 - [Rust Book](https://doc.rust-lang.org/book/)
 - [Soroban Examples](https://github.com/stellar/soroban-examples)
 
-## 🤝 Contribuição
+## 🤝 Contributing
 
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 📄 Licença
+## 📄 License
 
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+This project is licensed under the MIT License. See the `LICENSE` file for more details.
 
-## 🆘 Suporte
+## 🆘 Support
 
-Se encontrar problemas:
-1. Verifique os logs de erro
-2. Consulte a documentação
-3. Abra uma issue no GitHub
-4. Entre em contato com a equipe de desenvolvimento
+If you encounter problems:
+1. Check error logs
+2. Consult the documentation
+3. Open an issue on GitHub
+4. Contact the development team
 
 ---
 
-**Desenvolvido com ❤️ para a comunidade Stellar**
+**Developed with ❤️ for the Stellar community**
